@@ -1,0 +1,6 @@
+bucket_name,region,permission
+test-111-3333,east-us-a,public
+test-113-3333,east-us-a,public
+test-113-333301,east-us-a,public
+test-114-3333,east-us-b,private
+test-116-3333,east-us-a,public

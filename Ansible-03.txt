@@ -1,0 +1,339 @@
+
+Modules and Playbooks:
+==============================================
+-Add and remove user
+-Install Apache Server , Jenkins, Docker , DB : Postgres 
+-Multiple Plays(task) in on Playbook
+-When statement
+-Looping 
+-Service, and handler 
+
+-OS List 
+
+9
+222..*
+[y]
+222.. - 
+
+[a]
+1
+1
+1
+2
+
+
+
+Modules: is called package or library or set functions 
+		--groups???id??
+=====================
+Example:
+	user :  is a module 
+
+	    append: yes  : modify user 	
+		--remove --
+	    state: absent
+            remove: yes
+
+		--ssh--
+	generate_ssh_key: yes
+    	ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+
+		--expire---
+	   expires: 1422403387
+		    20191101	
+			
+	
+
+Add and remove user
+============================================================================
+
+Examples:
+
+- name: Add the user with a specific uid and a primary group of 'admin'
+  user:
+    name: user1
+    comment: user one
+    uid: 1040
+    group: admin
+
+- name: Add the user  with a bash shell, appending the group 'admins' and 'developers' to the user's groups
+  user:
+    name: user2
+    shell: /bin/bash
+    groups: admins,developers
+    append: yes
+
+- name: Remove the user 
+  user:
+    name: user1
+    state: absent
+    remove: yes
+
+- name: Create a 2048-bit SSH key for user user3 in ~user3/.ssh/id_rsa
+  user:
+    name: user3
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+
+- name: Added a consultant whose account you want to expire
+  user:
+    name: james18
+    shell: /bin/zsh
+    groups: developers
+    expires: 1422403387
+
+Install Apahce Server
+===========================================================================
+For starters, here’s a playbook, verify-apache.yml that contains just one play:
+
+---
+- hosts: webservers
+  vars:
+    http_port: 80
+    max_clients: 200
+  remote_user: root
+  tasks:
+  - name: ensure apache is at the latest version
+    yum:
+      name: httpd
+      state: latest
+  - name: write the apache config file
+    template:
+      src: /srv/httpd.j2
+      dest: /etc/httpd.conf
+    notify:
+    - restart apache
+  - name: ensure apache is running
+    service:
+      name: httpd
+      state: started
+  handlers:
+    - name: restart apache
+      service:
+        name: httpd
+        state: restarted
+
+
+Multiple Plays(task) in on Playbook
+===========================================================================
+Multiple ‘plays’, it is possible to orchestrate multi-machine deployments, running certain steps on all machines in the webservers group, then certain steps on the database server group, then more commands back on the webservers group, etc.
+
+“plays” are more or less a sports analogy. You can have quite a lot of plays that affect your systems to do different things. It’s not as if you were just defining one particular state or model, and you can run different plays at different times.
+
+
+Playbooks can contain multiple plays. You may have a playbook that targets first the web servers, and then the database servers. For example:
+
+---
+- hosts: webservers
+  remote_user: root
+
+  tasks:
+  - name: ensure apache is at the latest version
+    yum:
+      name: httpd
+      state: latest
+  - name: write the apache config file
+    template:
+      src: /srv/httpd.j2
+      dest: /etc/httpd.conf
+
+- hosts: databases
+  remote_user: root
+
+  tasks:
+  - name: ensure postgresql is at the latest version
+    yum:
+      name: postgresql
+      state: latest
+  - name: ensure that postgresql is started
+    service:
+      name: postgresql
+      state: started
+
+You can use this method to switch between the host group you’re targeting, the username logging into the remote servers, whether to sudo or not, and so forth. Plays, like tasks, run in the order specified in the playbook: top to bottom.
+
+
+
+When Statement
+========================================================
+The When Statement
+Sometimes you will want to skip a particular step on a particular host. This could be something as simple as not installing a certain package if the operating system is a particular version, or it could be something like performing some cleanup steps if a filesystem is getting full.
+
+
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: hello
+      when:
+        - '"RedHat" == "RedHat"'
+        - security|d('') != '' or kernel|d('') != '' or specified_packages|d('') != ''
+
+
+
+
+tasks:
+  - name: "shut down Debian flavored systems"
+    command: /sbin/shutdown -t now
+    when: ansible_facts['os_family'] == "Debian"
+    # note that all variables can be used directly in conditionals without double curly braces
+
+You can also use parentheses to group conditions:
+
+tasks:
+  - name: "shut down CentOS 6 and Debian 7 systems"
+    command: /sbin/shutdown -t now
+    when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "6") or
+          (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "7")
+Multiple conditions that all need to be true (a logical ‘and’) can also be specified as a list:
+
+tasks:
+  - name: "shut down CentOS 6 systems"
+    command: /sbin/shutdown -t now
+    when:
+      - ansible_facts['distribution'] == "CentOS"
+      - ansible_facts['distribution_major_version'] == "6"
+
+
+
+
+Sometimes you’ll get back a variable that’s a string and you’ll want to do a math operation comparison on it. You can do this like so:
+-----------------------------------------------
+tasks:
+  - shell: echo "only on Red Hat 6, derivatives, and later"
+    when: ansible_facts['os_family'] == "RedHat" and ansible_facts['lsb']['major_release']|int >= 6
+
+
+Variables defined in the playbooks or inventory can also be used. An example may be the execution of a task based on a variable’s boolean value:
+
+vars:
+  epic: true
+Then a conditional execution might look like:
+
+tasks:
+    - shell: echo "This certainly is epic!"
+      when: epic
+or:
+
+tasks:
+    - shell: echo "This certainly isn't epic!"
+      when: not epic
+If a required variable has not been set, you can skip or fail using Jinja2’s defined test. For example:
+
+tasks:
+    - shell: echo "I've got '{{ foo }}' and am not afraid to use it!"
+      when: foo is defined
+
+    - fail: msg="Bailing out. this play requires 'bar'"
+      when: bar is undefined
+This is especially useful in combination with the conditional import of vars files (see below). As the examples show, you don’t need to use {{ }} to use variables inside conditionals, as these are already implied.
+
+Loops and Conditionals
+Combining when with loops (see Loops), be aware that the when statement is processed separately for each item. This is by design:
+
+tasks:
+    - command: echo {{ item }}
+      loop: [ 0, 2, 4, 6, 8, 10 ]
+      when: item > 5
+If you need to skip the whole task depending on the loop variable being defined, used the |default filter to provide an empty iterator:
+
+- command: echo {{ item }}
+  loop: "{{ mylist|default([]) }}"
+  when: item > 5
+If using a dict in a loop:
+
+- command: echo {{ item.key }}
+  loop: "{{ query('dict', mydict|default({})) }}"
+  when: item.value > 5
+
+
+
+
+Services
+=======================================================
+This example playbook installs Apache2 on both Debian/Ubuntu and CentOS. This example used apache because the name package name is different on the two distributions.
+
+---
+- hosts: example
+  become: true
+  user: remy
+  connection: ssh 
+
+  tasks:
+  - name: Install apache
+    apt: 
+      name: {{ item }} 
+      state: latest
+    with_items:
+     - apache2
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: Install httpd
+    yum: 
+      name: {{ item }} 
+      state: latest
+    with_items:
+     - httpd
+     - git 
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+  - name: restart apache
+    service: 
+      name: apache2 
+      state: started 
+      enabled: yes
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: restart httpd
+    service: 
+      name: httpd 
+      state: started 
+      enabled: yes
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+
+
+OS List:
+-----------
+OS_FAMILY = dict(
+            RedHat = 'RedHat',
+            Fedora = 'RedHat', 
+            CentOS = 'RedHat', 
+            Scientific = 'RedHat',
+            SLC = 'RedHat', 
+            Ascendos = 'RedHat', 
+            CloudLinux = 'RedHat', 
+            PSBM = 'RedHat',
+            OracleLinux = 'RedHat', 
+            OVS = 'RedHat', 
+            OEL = 'RedHat', 
+            Amazon = 'RedHat',
+            XenServer = 'RedHat', 
+            Ubuntu = 'Debian', 
+            Debian = 'Debian', 
+            SLES = 'Suse',
+            SLED = 'Suse', 
+            OpenSuSE = 'Suse', 
+            SuSE = 'Suse', 
+            Gentoo = 'Gentoo',
+            Archlinux = 'Archlinux', 
+            Mandriva = 'Mandrake', 
+            Mandrake = 'Mandrake',
+            Solaris = 'Solaris', 
+            Nexenta = 'Solaris',  
+            OmniOS = 'Solaris', 
+            OpenIndiana = 'Solaris',
+            SmartOS = 'Solaris', 
+            AIX = 'AIX', 
+            Alpine = 'Alpine', 
+            MacOSX = 'Darwin',
+            FreeBSD = 'FreeBSD', 
+            HPUX = 'HP-UX'
+        )
+
+
+
+--------------------------

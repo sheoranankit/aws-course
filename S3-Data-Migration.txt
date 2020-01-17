@@ -1,0 +1,21 @@
+Recap Python:
+	condition 
+	loop
+	list
+	function 
+	exception handling
+Boto3: is module or package(library)
+	How to install boto3  
+		open cmd 
+		cd "python_directory/scripts"
+		pip install boto3
+IAM User:
+	Access key
+	Access Token
+	
+
+Python code to create s3 and upload files/folder
+
+Python code to create VMs(EC2)
+
+	

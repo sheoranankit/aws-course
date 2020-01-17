@@ -1,0 +1,53 @@
+import boto3
+
+#login to AWS API 
+Access_key_ID='AKIAXM7XUAWH2HT6EAMM'
+Secret_access_key='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'
+o = boto3.client('s3',aws_access_key_id=Access_key_ID,aws_secret_access_key=Secret_access_key)
+
+
+#create new bucket 
+def create_bucket(name,is_exist):
+    if is_exist == False:
+        o.create_bucket(Bucket=name)
+        print('Bucket is created ')
+    else:
+        print(name,' is already exist')
+
+    
+    
+
+#get list existing bucket and return true if given name is already exist 
+#new_bucket ='data-migrration-11110222033444'
+def get_bucket(new_bucket,show=''):
+    is_exist =  False
+    #get list of existing buckets 
+    res = o.list_buckets()
+
+    for b in res['Buckets']:
+        if show=='':
+            print(b['Name'])
+        if new_bucket ==b['Name']:
+            is_exist = True
+    return is_exist
+
+
+
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

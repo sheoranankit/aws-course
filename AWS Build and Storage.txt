@@ -1,0 +1,45 @@
+Here are five of our favorite AWS storage types.
+- S3(Simple Storage Service)
+- Glacier
+- EFS
+- EBS
+- Snowball
+
+
+Amazon S3 (Bucket)
+------------
+Scalability is the top goal of Amazon S3, making this solution ideal for businesses that have fluctuating storage needs throughout the year. S3 also integrates with a wide variety of third-party applications, which is a big help to businesses that ebb and flow.
+
+Businesses that choose S3 will also find that the solution’s 99.99 percent availability means their files are pretty much always available when they need them. All of this at an affordable price that can help a small- or mid-sized business stay within its budgetary constraints.
+
+Amazon Glacier(Glacier Vaults)
+--------------------------------
+Affordability is the big draw of Glacier, which is marketed as extremely low-cost storage. However, Glacier is designed for storing data that doesn’t need to be retrieved on a regular basis. This solution is ideal for end users who have a need to archive large volumes of data that they’ll rarely access, if ever.
+
+Amazon Simple Storage Service Glacier, that is Amazon S3 Glacier 
+(Glacier), is a storage service optimized for infrequently used data,
+ or "cold data." Glacier is an extremely low-cost storage service that provides durable storage with security features for data archiving and backup.
+
+Amazon EFS
+---------------
+Amazon’s Elastic File System (EFS) was the first product to work with several Elastic Compute Cloud (EC2) instances. EFS gives administrators the opportunity to grant specific file permissions across their storage. Like the other options, EFS scales to meet a business’s demands from one month to the next, but it is slightly more costly than other options.
+
+This will be the best solution for businesses with a heavy demand for file storage, as well as organizations that work with a variety of files and applications, including content management, enterprise applications, and media.
+
+-Amazon EFS provides a durable, high throughput file system for content management systems and web serving applications that store and serve information for a range of applications like websites, online publications, and archives
+
+Amazon EBS(Volume)
+---------------
+Elastic Block Store (EBS) is designed to be used in conjunction with Amazon EC2, with data only storable when the two are connected. This limits scalability, making it a better solution for businesses that have steady storage needs because additional space will need to be purchased.
+
+The EBS pay-per-use model can help save some businesses money, though, since they’ll only pay for what they use. Due to its focus on consistency and low latency, EBS is ideal for businesses that run demanding applications like data analytics software and SQL databases.
+
+
+
+AWS Snowball
+-------------------
+Today’s data-heavy IT environments mean that information often needs to be transferred from one place to another. Snowball is designed to make such transfers easy without incurring astronomical network usage fees. Instead of paying a high-priced developer to write code to push a transfer, admins simply move data using the Snowball appliance, with no limits.
+
+Snowball is a petabyte-scale data transport solution that uses devices designed to be secure to transfer large amounts of data into and out of the AWS Cloud.
+
+AWS Snowball Edge is a 100TB data transfer device with on-board storage and compute capabilities. You can use Snowball Edge to move large amounts of data into and out of AWS, as a temporary storage tier for large local datasets, or to support local workloads in remote or offline locations

@@ -1,0 +1,96 @@
+Recap:
+	Python envirionment
+	Python data type and variable
+	Python input and ouput
+	Python condition : if condition 
+	Python loop 
+
+Today's Topics
+=========================
+- Break and continue 		
+		break : is keyword which stop/terminate the loop 
+		continue : is keyword which skip the current iteration and resume from next
+			1 2 .... 	10
+- File Handling	
+		- how to read and write/append data from/with .txt(open source file) 
+
+		open(path,mode)
+			path: physical location of file 
+			mode: 
+				r - read
+				w - write (overwrite)
+				a - append 
+
+		read()		: read all content from file 
+		readline()	: read line by line 
+		readlines()	: read all content from file and convert to list (every line for file will become one item of list)
+				example:
+				test.txt
+				hi
+				this is test	code
+				end of file 
+
+
+				--read 
+				['hi\n','this is test\tcode\n','end of file']
+		
+		
+		write(msg/data)	: write content to the file 
+		close()		: save and close the instance of file 
+		
+- Function  and modules
+	Function: set of command or instructiions is called function 
+		: reusability of souce code 
+		
+		example:
+			def <funname>():
+				statement
+				statement		
+
+		There are following type of function:
+			- function with no argument
+				def <test>():
+					
+			- function with argument 
+				def <create_server>(name):
+					..
+			- function with return 
+				def <getcount>():
+
+					return data/mesage 
+	module: is library or package
+	There are following inbuilt modules:
+			os		* 
+			shutil
+			time
+			threading
+			socket 
+			boto3		*			
+			
+		
+- Exception handling   
+		Exception: is runtime error which may or may not occur 
+		Handling : tackle the error when this will occur 
+		
+		Objective:
+			- show user friendly message 
+			- prevent the program from failure due to single/few error
+			- store error logs 
+			
+		Keywords:
+			- try		: logical error should be written in this block 
+			- except	: recieve the error 	
+			- pass		: sliently fail/ continue the code without any message 
+			- finally 	: will execute always either exception will occur or not 	
+			- raise 	: user defined error 
+
+		
+	
+				
+
+
+
+
+
+
+		

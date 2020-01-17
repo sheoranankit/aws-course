@@ -1,0 +1,263 @@
+Playbook: 1-playbook.yml
+
+one playbook can contains multiple tasks 
+and every task we can have multiple modules
+======================= example 1
+---
+- hosts: all
+  tasks:
+	- name: create user
+	  .....
+	  ...
+	- name:  hello
+	  debug: hello
+
+	- name: 
+		
+======================= example 2 with variables
+---
+- hosts: all
+  vars:
+    x:
+	- user1
+	- user2
+	- user333
+	- user34
+	- user354
+	- user333
+	- user34
+  tasks:
+	- name: hello
+	  debug: "{{ x }}"
+	-name: create user 
+	 user:
+           name: {{ item }}      
+	 with_items: "{{ x }}"
+
+	 
+
+
+
+	  
+	
+
+
+Variables
+===========================================================
+Declare Variable:
+
+Example 1:
+
+vars:			--vars is keyword 
+ items:			--items name (user defined name)
+    - test1		--item or data 	 (user defined name)
+    - test2		--item or data  (user defined name)
+    - test3		--item or data 	(user defined name)
+
+
+Example 2:
+
+vars:
+ items: ["test1", "test2", "test2"]	
+
+
+
+Access variable:
+
+			"{{ items }}"
+
+
+
+
+Loop/ Iterator : 	
+
+
+		---
+		- hosts: all
+		  vars:
+			xy:
+			 - a
+			 - b 	
+		  tasks:
+			-name: create user 
+	                 user:
+                          name: {{item }}
+      
+			 with_items: "{{ xy }}"
+
+
+Read file and assign to variable:
+
+Example1:
+vars:
+ data:  "{{ lookup('file', '/etc/foo.txt') }}"
+
+tasks:
+	- debug: msg=" sjsgsghf ghfg ghfdgd fgdfdg dfgdfgfdg {{data}}"
+	
+
+======================================================================
+mydata.yml
+--------------------
+alpha:
+	- name: user1
+	  comment: test
+          pwd: 22344
+          group : 44
+	- name: user2
+	  comment: test 
+	- name: user3
+	- name: user4
+
+or
+mydata1.yml
+--------------------
+alpha:
+	- user1
+	- user2
+	- user3
+
+
+-----------------------------------------
+playbook-createuser.yml
+----------------------------------
+---
+- hosts: all
+  sudo: yes
+  vars_files:
+	- mydata.yml
+	
+  taks:
+	- name:  create user
+	  user: {{item.name}}
+	  password: {{item.comment}}
+	   	
+	  
+	
+	  with_items: "{{ alpha }}"
+...
+
+
+
+
+
+===========================================================
+---
+- hosts: all
+  vars:
+     contents: "{{ lookup('file', '/etc/foo.txt') }}"
+     abc: "{{ python abcd.py}}"	
+
+  tasks:
+
+     - debug: msg="the value of foo.txt is {{ contents }}"
+
+
+======================================================================
+
+- debug: msg="the value of foo.txt is {{lookup('file', '/etc/foo.txt') }}"
+
+- name: display multiple file contents
+  debug: var=item
+  with_file:
+    - "/path/to/foo.txt"
+    - "bar.txt"  # will be looked in files/ dir relative to play or in role
+    - "/path/to/biz.txt"
+========================================================================
+- name: get contents of file
+  command: cat /path/to/file
+  register: filename
+  become: true # use case specific option
+
+- name: viewing the contents
+  debug:
+    msg: "{{filename.stdout}}"
+
+=========================================================================
+ tasks:
+  - name: "Create user accounts and add users to groups"
+    user:
+      name: "{{ item }}"
+      groups: "sudo"
+    with_items: "{{ users }}"
+
+===============================================================================
+ - name: "Add authorized keys"
+    authorized_key:
+      user: "{{ item }}"
+      key: "{{ lookup('file', 'files/'+ item + '.key.pub') }}"
+    with_items: "{{ users }}"
+
+===============================================================================
+- hosts: "localhost"
+  connection: "local"
+  vars:
+    users:
+    - user1
+    - user2
+    - user3
+  tasks:
+  - name: "Create user accounts and add users to groups"
+    user:
+      name: "{{ item }}"
+      groups: "sudo"
+    with_items: "{{ users }}"
+...
+
+=======================================================
+---
+- hosts: "localhost"
+  connection: "local"
+  vars:
+    users:
+    -  "paul"
+    - "tanya"
+    - "ruby"
+  tasks:
+  - name: "Create user accounts"
+    user:
+      name: "{{ item }}"
+      groups: "admin,www-data"
+    with_items: "{{ users }}"
+  - name: "Add authorized keys"
+    authorized_key:
+      user: "{{ item }}"
+      key: "{{ lookup('file', 'files/'+ item + '.key.pub') }}"
+    with_items: "{{ users }}"
+  - name: "Allow admin users to sudo without a password"
+    lineinfile:
+      dest: "/etc/sudoers" # path: in version 2.3
+      state: "present"
+      regexp: "^%admin"
+      line: "%admin ALL=(ALL) NOPASSWD: ALL"
+
+==================================================================
+Define users.yml:
+
+users:
+  - name: testuser3
+    comment: testuser3
+    groups: wheel
+  - name: testuser4
+    comment: testuser4
+    groups: users
+
+
+
+And in your playbook:
+
+- hosts: servers
+  remote_user: root
+  vars_files:
+    - /vars/users.yml
+  tasks:
+    - name: adding several users
+      user:
+        name: "{{ item.name }}"
+        state: present
+        comment: "{{ item.comment }}"
+        password: "$1$*)^%$CeUUJM&v#0pQhHjqjpqX1"
+        update_password: on_create
+        createhome: yes
+        groups: "{{ item.groups }}"
+      with_items: "{{ users }}"

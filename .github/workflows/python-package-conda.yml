@@ -14,10 +14,10 @@ jobs:
         uses: lewagon/wait-on-check-action@v1.3.1
         with:
           ref: 'sheoranankit/janusdeployments@main'
-          running-workflow-name: 'Docker Image CI'
+          check-name: 'Docker Image CI'
           repo-token: ${{ secrets.ACTIONS_TOKEN }}
-          wait-interval: 10
-          allowed-conclusions: success
+#           wait-interval: 10
+#           allowed-conclusions: success
   build-linux:
     needs: [publish]
     runs-on: ubuntu-latest

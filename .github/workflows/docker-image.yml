@@ -1,0 +1,30 @@
+
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_description:
+        description: 'Enter description of release (max 16 characters)'
+        required: true
+        default: 'Enter Value'
+      ami_tag_name:
+        description: 'Enter AMI tag'
+        required: true
+        default: 'Enter ami tag'
+      environment:
+        description: 'Enter environment ("Prod deploy" or "Crm deploy")'
+        required: true
+        default: 'Enter Value'
+
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: echo "hello"

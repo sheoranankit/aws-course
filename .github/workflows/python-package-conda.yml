@@ -2,24 +2,24 @@ name: Python Package using Conda
 
 on:
   workflow_run:
-    workflows: ["Docker Image CI"]
-    types:
-      - completed
+#     workflows: ["Docker Image CI"]
+#     types:
+#       - completed
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for other checks to succeed
-        uses: lewagon/wait-on-check-action@v1.3.1
-        with:
-          ref: 'sheoranankit/janusdeployments@main'
-          check-name: 'Docker Image CI'
-          repo-token: ${{ secrets.ACTIONS_TOKEN }}
+#   publish:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Wait for other checks to succeed
+#         uses: lewagon/wait-on-check-action@v1.3.1
+#         with:
+#           ref: 'sheoranankit/janusdeployments@main'
+#           check-name: 'Docker Image CI'
+#           repo-token: ${{ secrets.ACTIONS_TOKEN }}
 #           wait-interval: 10
 #           allowed-conclusions: success
   build-linux:
-    needs: [publish]
+#     needs: [publish]
     runs-on: ubuntu-latest
     steps:
       - name: echo

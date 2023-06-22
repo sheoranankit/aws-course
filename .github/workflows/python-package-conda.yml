@@ -11,7 +11,7 @@ jobs:
         uses: lewagon/wait-on-check-action@v1.3.1
         with:
           ref: master
-          check-name: Docker Image CI
+          check-name: build
           repo-token: ${{ secrets.ACTIONS_TOKEN }}
           wait-interval: 10
           allowed-conclusions: success
